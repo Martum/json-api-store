@@ -592,6 +592,14 @@ export default class Store {
     }
   }
 
+  /**
+  * Cleans the store
+  *
+  */
+  cleanAll() {
+    this._data = {}
+  }
+
   _addField(object, resource, definition, fieldName) {
     var field = definition[fieldName];
     var newValue = field.deserialize.call(this, object, fieldName);

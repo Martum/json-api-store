@@ -12860,6 +12860,8 @@ var AjaxAdapter = (function () {
 
       source.connect();
 
+      store.cleanAll();
+
       return source;
     }
   }, {
@@ -13857,6 +13859,16 @@ var Store = (function () {
       } else {
         throw new Error("Adapter missing. Specify an adapter when creating the store: `var store = new Store(adapter);`");
       }
+    }
+
+    /**
+    * Cleans the store
+    *
+    */
+  }, {
+    key: "cleanAll",
+    value: function cleanAll() {
+      this._data = {};
     }
   }, {
     key: "_addField",

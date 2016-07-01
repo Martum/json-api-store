@@ -83,6 +83,8 @@ export default class AjaxAdapter {
 
     source.connect();
 
+    store.cleanAll();
+
     return source;
 
   }

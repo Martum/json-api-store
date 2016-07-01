@@ -116,6 +116,8 @@ var AjaxAdapter = (function () {
 
       source.connect();
 
+      store.cleanAll();
+
       return source;
     }
   }, {
