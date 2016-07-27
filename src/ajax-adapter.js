@@ -78,7 +78,7 @@ export default class AjaxAdapter {
       responseType: "auto",
       url: this._getUrl(type, id, options)
     }).do(e => store.push(e.response))
-      .map(() => id ? store.find(type, id) : store.findAll(type))
+      .map(e => id ? store.find(type, id) : store.findAll(type, e.response.data.map(elem => elem.id)))
       .publish();
 
     source.connect();

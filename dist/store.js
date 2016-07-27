@@ -431,6 +431,8 @@ var Store = (function () {
     value: function findAll(type) {
       var _this6 = this;
 
+      var order = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
       if (type) {
         var definition = this._types[type];
         if (definition) {
@@ -442,9 +444,17 @@ var Store = (function () {
               });
             })();
           }
-          return Object.keys(this._data[type]).map(function (x) {
-            return _this6._data[type][x];
-          });
+
+          // To avoid unordering
+          if (!order) {
+            return Object.keys(this._data[type]).map(function (x) {
+              return _this6._data[type][x];
+            });
+          } else {
+            return order.map(function (id) {
+              return _this6._data[type][id];
+            });
+          }
         } else {
           throw new TypeError("Unknown type '" + type + "'");
         }

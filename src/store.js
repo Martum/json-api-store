@@ -361,7 +361,7 @@ export default class Store {
    * @param {!string} type - Type of the resource to find.
    * @return {Object[]} - An array of resources.
    */
-  findAll(type) {
+  findAll(type, order = null) {
     if (type) {
       let definition = this._types[type];
       if (definition) {
@@ -369,7 +369,14 @@ export default class Store {
           let collection = {};
           definition._names.forEach(t => this._data[t] = collection);
         }
-        return Object.keys(this._data[type]).map(x => this._data[type][x]);
+
+        // To avoid unordering
+        if(!order){
+          return Object.keys(this._data[type]).map(x => this._data[type][x]);
+        } else {
+          return order.map(id => this._data[type][id])
+        }
+
       } else {
         throw new TypeError(`Unknown type '${type}'`);
       }

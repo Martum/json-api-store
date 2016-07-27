@@ -251,11 +251,6 @@
 // shim for using process in browser
 
 var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it don't break things.
-var cachedSetTimeout = setTimeout;
-var cachedClearTimeout = clearTimeout;
-
 var queue = [];
 var draining = false;
 var currentQueue;
@@ -280,7 +275,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = cachedSetTimeout(cleanUpNextTick);
+    var timeout = setTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -297,7 +292,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    cachedClearTimeout(timeout);
+    clearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -309,7 +304,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        cachedSetTimeout(drainQueue, 0);
+        setTimeout(drainQueue, 0);
     }
 };
 
@@ -12854,8 +12849,10 @@ var AjaxAdapter = (function () {
         url: this._getUrl(type, id, options)
       })["do"](function (e) {
         return store.push(e.response);
-      }).map(function () {
-        return id ? store.find(type, id) : store.findAll(type);
+      }).map(function (e) {
+        return id ? store.find(type, id) : store.findAll(type, e.response.data.map(function (elem) {
+          return elem.id;
+        }));
       }).publish();
 
       source.connect();
@@ -13598,6 +13595,8 @@ var Store = (function () {
     value: function findAll(type) {
       var _this6 = this;
 
+      var order = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
       if (type) {
         var definition = this._types[type];
         if (definition) {
@@ -13609,9 +13608,17 @@ var Store = (function () {
               });
             })();
           }
-          return Object.keys(this._data[type]).map(function (x) {
-            return _this6._data[type][x];
-          });
+
+          // To avoid unordering
+          if (!order) {
+            return Object.keys(this._data[type]).map(function (x) {
+              return _this6._data[type][x];
+            });
+          } else {
+            return order.map(function (id) {
+              return _this6._data[type][id];
+            });
+          }
         } else {
           throw new TypeError("Unknown type '" + type + "'");
         }
